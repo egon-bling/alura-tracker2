@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["node_modules/@types", "node_modules/vue-router/types"],
     "target": "esnext",
     "module": "esnext",
     "strict": true,
@@ -13,7 +14,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env"
+      "vue-router",
+      "webpack-env",
     ],
     "paths": {
       "@/*": [
@@ -32,7 +34,8 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+
   ],
   "exclude": [
     "node_modules"
