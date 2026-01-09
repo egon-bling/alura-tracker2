@@ -14,8 +14,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "vue-router",
-      "webpack-env",
+      "webpack-env"
     ],
     "paths": {
       "@/*": [
