@@ -40,24 +40,31 @@
 </template>
 
 <script lang="ts">
-import IProjeto from "@/interfaces/IProjeto";
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
+import { useStore } from "@/store";
 export default defineComponent({
     name: "MeusProjetos", //Este é o único lugar onde o nome é multi-word
     data() {
         return {
             nomeDoProjeto: '',
-            projetos: [] as IProjeto[]
         };
     },
     methods: {
         salvar() {
-            const projeto: IProjeto = {
+            /* const projeto: IProjeto = {
                 nome: this.nomeDoProjeto,
-                id: new Date().toISOString()
-            }
-            this.projetos.push(projeto)
-            this.nomeDoProjeto = ''
+                id: new Date().toISOString(),
+            };
+            this.projetos.push(projeto);*/
+            this.store.commit('ADICIONA_PROJETO', this.nomeDoProjeto)
+            this.nomeDoProjeto = "";
+        },
+    },
+    setup () {
+        const store = useStore()
+        return {
+            store,
+            projetos: computed(() => store.state.projetos)
         }
     }
 });
