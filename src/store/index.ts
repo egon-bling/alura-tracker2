@@ -1,17 +1,20 @@
 import IProjeto from "@/interfaces/IProjeto";
 import { InjectionKey } from "vue";
 import { createStore, Store, useStore as vuexUseStore } from "vuex";
-import { ADICIONA_PROJETO, ALTERA_PROJETO, EXCLUI_PROJETO } from "./tipomutacoes";
+import { ADICIONA_PROJETO, ALTERA_PROJETO, EXCLUI_PROJETO, NOTIFICAR } from "./tipomutacoes";
+import INotificacao from "@/interfaces/INotificacao"; //No do professor está { INotificacao }
 
 interface Estado {
     projetos: IProjeto[]
+    notificacoes?: INotificacao[]
 }
  
 export const key: InjectionKey<Store<Estado>> = Symbol()
 
 export const store = createStore<Estado>({
     state: {
-        projetos: []
+        projetos: [],
+        notificacoes: []
     },
     mutations: {
         [ADICIONA_PROJETO](state, nomeDoProjeto: string) {
@@ -27,6 +30,14 @@ export const store = createStore<Estado>({
         },
         [EXCLUI_PROJETO](state, id: string) {
             state.projetos = state.projetos.filter(proj => proj.id != id)
+        },
+        [NOTIFICAR](state, novaNotificacao: INotificacao) {
+            novaNotificacao.id = new Date().getTime()
+            state.notificacoes!.push(novaNotificacao) // o "!" é para garantir que não é undefined (mas prof não usou)
+
+            setTimeout(()   => {
+                state.notificacoes = state.notificacoes!.filter(notificacao => notificacao.id != novaNotificacao.id)
+            }, 3000)
         }
     }
 })
