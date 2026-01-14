@@ -50,15 +50,17 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { useStore } from "@/store";
+import { OBTER_PROJETOS, REMOVER_PROJETO } from "@/store/tipo-acoes";
 export default defineComponent({
     name: "MinhaLista", //Este é o único lugar onde o nome é multi-word
     methods: {
         excluir(id: string) {
-            this.store.commit('EXCLUI_PROJETO', id)
+            this.store.dispatch(REMOVER_PROJETO, id)
         }
     },
     setup() {
         const store = useStore()
+        store.dispatch(OBTER_PROJETOS)
         return {
             projetos: computed(() => store.state.projetos),
             store
