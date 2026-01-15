@@ -2,11 +2,35 @@
   "projetos": [
     {
       "id": 1,
-      "nome": "Alura tracker"
+      "nome": "Alura tracker 1.0"
     },
     {
       "id": 2,
       "nome": "Alura Tracker 2.0"
+    },
+    {
+      "id": 3,
+      "nome": "Projeto Alura 2"
+    }
+  ],
+  "tarefas": [
+    {
+      "id": 1,
+      "duracaoEmSegundos": 90,
+      "descricao": "Estudar Vue.js",
+      "projeto": {
+        "id": 1,
+        "nome": "Alura tracker"
+      }
+    },
+    {
+      "duracaoEmSegundos": 3,
+      "descricao": "Estudar mais ainda",
+      "projeto": {
+        "nome": "Vue 3",
+        "id": 3
+      },
+      "id": 2
     }
   ]
 }

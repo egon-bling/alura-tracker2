@@ -1,44 +1,42 @@
-import IProjeto from "@/interfaces/IProjeto";
 import { InjectionKey } from "vue";
 import { createStore, Store, useStore as vuexUseStore } from "vuex";
-import { ADICIONA_PROJETO, ALTERA_PROJETO, DEFINIR_PROJETOS, EXCLUI_PROJETO, NOTIFICAR } from "./tipomutacoes";
+import { ADICIONA_TAREFA, ALTERA_TAREFA, DEFINIR_TAREFAS, NOTIFICAR } from "./tipomutacoes";
 import INotificacao from "@/interfaces/INotificacao"; //No do professor está { INotificacao }
-import { ALTERAR_PROJETO, CADASTRAR_PROJETO, OBTER_PROJETOS, REMOVER_PROJETO } from "./tipo-acoes";
+import { CADASTRAR_TAREFA, OBTER_TAREFAS } from "./tipo-acoes";
 import http from "@/http";
+import ITarefa from "@/interfaces/ITarefa";
+import { EstadoDoProjeto, projeto } from "./modulo/projeto";
 
-interface Estado {
-    projetos: IProjeto[]
+export interface Estado {
+    tarefas?: ITarefa[]
     notificacoes?: INotificacao[]
+    projeto: EstadoDoProjeto //professor escreveu apenas EstadoProjeto, mas não foi o nome dado (prestar atenção de corrige)
 }
  
 export const key: InjectionKey<Store<Estado>> = Symbol()
 
 export const store = createStore<Estado>({
     state: {
-        projetos: [],
-        notificacoes: []
+        tarefas: [],
+        notificacoes: [],
+        projeto: {
+            projetos: []
+        }
     },
     mutations: {
-        [ADICIONA_PROJETO](state, nomeDoProjeto: string) {
-            const projeto = {
-                id: new Date().toISOString(),
-                nome: nomeDoProjeto
-            } as IProjeto
-            state.projetos.push(projeto)
+        [DEFINIR_TAREFAS](state, tarefas: ITarefa[]) {
+            state.tarefas = tarefas
         },
-        [ALTERA_PROJETO](state, projeto: IProjeto) {
-            const index = state.projetos.findIndex(proj => proj.id == projeto.id)
-            state.projetos[index] = projeto
+        [ADICIONA_TAREFA](state, tarefa: ITarefa) {
+            state.tarefas?.push(tarefa) //confirmar se tem o "?"
         },
-        [EXCLUI_PROJETO](state, id: string) {
-            state.projetos = state.projetos.filter(proj => proj.id != id)
-        },
-        [DEFINIR_PROJETOS](state, projetos: IProjeto[]) {
-            state.projetos = projetos
+        [ALTERA_TAREFA](state, tarefa: ITarefa) {
+            const index = state.tarefas?.findIndex(t => t.id == tarefa.id)
+            state.tarefas![index!] = tarefa
         },
         [NOTIFICAR](state, novaNotificacao: INotificacao) {
             novaNotificacao.id = new Date().getTime()
-            state.notificacoes!.push(novaNotificacao) // o "!" é para garantir que não é undefined (mas prof não usou)
+            state.notificacoes!.push(novaNotificacao) // o "!" é para garantir que não é undefined (mas prof não usou nem aqui, nem em outras partes)
 
             setTimeout(()   => {
                 state.notificacoes = state.notificacoes!.filter(notificacao => notificacao.id != novaNotificacao.id)
@@ -46,22 +44,21 @@ export const store = createStore<Estado>({
         }
     },
     actions: {
-        [OBTER_PROJETOS] ({ commit }) {
-            http.get('projetos')
-                .then(response => commit(DEFINIR_PROJETOS, response.data))
+        [OBTER_TAREFAS] ({ commit }) {
+            http.get('tarefas')
+                .then(response => commit(DEFINIR_TAREFAS, response.data))
         },
-        [CADASTRAR_PROJETO] (contexto, nomeDoProjeto: string) {
-            return http.post('/projetos', {
-                nome: nomeDoProjeto
-            })
+        [CADASTRAR_TAREFA] ({commit}, tarefa: ITarefa) {
+            return http.post('/tarefas', tarefa)
+                .then(response => commit(ADICIONA_TAREFA, response.data))
         },
-        [ALTERAR_PROJETO] (contexto, projeto: IProjeto) {
-            return http.put(`/projetos/${projeto.id}`, projeto)
+        [ALTERA_TAREFA] ({commit}, tarefa: ITarefa) {
+            return http.put(`/tarefas/${tarefa.id}`, tarefa)
+                .then(() => commit(ALTERA_TAREFA, tarefa))
         },
-        [REMOVER_PROJETO] ({commit}, id: string) {
-            return http.delete(`/projetos/${id}`)
-                .then(() => commit(EXCLUI_PROJETO, id))
-        }
+    },
+    modules: {
+        projeto 
     }
 })
 
