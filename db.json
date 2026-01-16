@@ -31,6 +31,15 @@
         "id": 3
       },
       "id": 2
+    },
+    {
+      "duracaoEmSegundos": 2,
+      "descricao": "Estudar bastante e falhar",
+      "projeto": {
+        "id": 2,
+        "nome": "Alura Tracker 2.0"
+      },
+      "id": 3
     }
   ]
 }

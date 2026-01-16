@@ -25,6 +25,7 @@ import { TipoNotificacao } from "@/interfaces/INotificacao";
 
 import useNotificador from "@/hooks/notificador";
 import { ALTERAR_PROJETO, CADASTRAR_PROJETO } from "@/store/tipo-acoes";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
     name: "MeuFormulario", //Este é o único lugar onde o nome é multi-word
@@ -45,25 +46,10 @@ export default defineComponent({
             nomeDoProjeto: '',
         };
     }, */
-    methods: {
-        salvar() {
-            if (this.id) {
-                this.store.dispatch(ALTERAR_PROJETO, {
-                    id: this.id,
-                    nome: this.nomeDoProjeto
-                }).then(() => this.lidarComSucesso());
-            } else {
-                this.store.dispatch(CADASTRAR_PROJETO, this.nomeDoProjeto)
-                    .then(() => this.lidarComSucesso());
-            }
-        },
-        lidarComSucesso() {
-            this.nomeDoProjeto = "";
-            this.notificar(TipoNotificacao.SUCESSO, 'Sucesso!', 'Projeto salvo corretamente.')
-            this.$router.push('/projetos')
-        }
-    },
+
     setup (props) {
+        
+        const router = useRouter();
 
         const store = useStore()
         const { notificar } = useNotificador()
@@ -71,15 +57,34 @@ export default defineComponent({
         const nomeDoProjeto = ref('')
 
         if (props.id) {
-            const projeto = store.state.projeto.projetos.find(proj => proj.id == props.id)
-            nomeDoProjeto.value = projeto?.nome || ''
+            const projeto = store.state.projeto.projetos.find( //este finde está gernado erro no carregamento da aplicação
+                (proj) => proj.id == props.id
+            );
+            nomeDoProjeto.value = projeto?.nome || '';
         }
 
+
+        const lidarComSucesso = () => {
+            nomeDoProjeto.value = "";
+            notificar(TipoNotificacao.SUCESSO, 'Sucesso!', 'Projeto salvo corretamente.');
+            router.push('/projetos');
+        }
+
+        const salvar = () => {
+            if (props.id) {
+                store.dispatch(ALTERAR_PROJETO, {
+                    id: props.id,
+                    nome: nomeDoProjeto.value
+                }).then(() => lidarComSucesso());
+            } else {
+                store.dispatch(CADASTRAR_PROJETO, nomeDoProjeto.value)
+                    .then(() => lidarComSucesso());
+            }
+        }
         
         return {
-            store,
-            notificar,
-            nomeDoProjeto
+            nomeDoProjeto,
+            salvar
         }
     }
 });
