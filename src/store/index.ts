@@ -12,7 +12,7 @@ export interface Estado {
     notificacoes?: INotificacao[]
     projeto: EstadoDoProjeto //professor escreveu apenas EstadoProjeto, mas não foi o nome dado (prestar atenção de corrige)
 }
- 
+
 export const key: InjectionKey<Store<Estado>> = Symbol()
 
 export const store = createStore<Estado>({
@@ -38,27 +38,34 @@ export const store = createStore<Estado>({
             novaNotificacao.id = new Date().getTime()
             state.notificacoes!.push(novaNotificacao) // o "!" é para garantir que não é undefined (mas prof não usou nem aqui, nem em outras partes)
 
-            setTimeout(()   => {
+            setTimeout(() => {
                 state.notificacoes = state.notificacoes!.filter(notificacao => notificacao.id != novaNotificacao.id)
             }, 3000)
         }
     },
     actions: {
-        [OBTER_TAREFAS] ({ commit }) {
-            http.get('tarefas')
+        [OBTER_TAREFAS]({ commit }, filtro: string) {
+
+            let url = 'tarefas'
+
+            if (filtro) {
+                url += '?descricao=' + filtro
+            }
+
+            http.get(url)
                 .then(response => commit(DEFINIR_TAREFAS, response.data))
         },
-        [CADASTRAR_TAREFA] ({commit}, tarefa: ITarefa) {
+        [CADASTRAR_TAREFA]({ commit }, tarefa: ITarefa) {
             return http.post('/tarefas', tarefa)
                 .then(response => commit(ADICIONA_TAREFA, response.data))
         },
-        [ALTERA_TAREFA] ({commit}, tarefa: ITarefa) {
+        [ALTERA_TAREFA]({ commit }, tarefa: ITarefa) {
             return http.put(`/tarefas/${tarefa.id}`, tarefa)
                 .then(() => commit(ALTERA_TAREFA, tarefa))
         },
     },
     modules: {
-        projeto 
+        projeto
     }
 })
 
